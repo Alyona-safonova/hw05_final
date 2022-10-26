@@ -6,8 +6,8 @@
 {% endblock title %}
 {% block content %}
 {% include 'posts/includes/switcher.html' %}
-  {% cache 20 index_page %}
 <h1>Это главная страница проекта Yatube</h1>
+  {% cache 20 index_page %}
   {% for post in page_obj %}
   <article>
   <ul>
@@ -29,5 +29,5 @@
   {% if not forloop.last %}<hr>{% endif %}
   {% endfor %}
   {% include 'posts/includes/paginator.html' %}
-    {% endcache %}
+  {% endcache %}
 {% endblock content %}

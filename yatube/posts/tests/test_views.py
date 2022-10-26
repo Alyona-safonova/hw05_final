@@ -3,6 +3,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
+from django.core.cache import cache
 
 from ..models import Post, Group, Comment, Follow
 
@@ -14,6 +15,7 @@ class PostPagesTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth')
+        cls.user1 = User.objects.create_user(username='leo')
         cls.group = Group.objects.create(
             title='Тестовая группа',
             slug='test-slug',
@@ -43,6 +45,8 @@ class PostPagesTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.author = Client()
+        self.author.force_login(self.user1)
 
     def test_pages_uses_correct_template(self):
         """проверяем, что во view-функциях используются
@@ -84,7 +88,7 @@ class PostPagesTests(TestCase):
 
     def test_profile_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
-        response = self.guest_client.get(
+        response = self.authorized_client.get(
             reverse("posts:profile", args=(self.post.author,))
         )
         self.assertIn('author', response.context)
@@ -168,10 +172,14 @@ class PostPagesTests(TestCase):
         """Тестирование кэша."""
         response = self.guest_client.get(reverse("posts:index"))
         response_1 = response.content
-        Post.objects.get(id=1).delete()
+        Post.objects.get(id=self.post.id).delete()
         response2 = self.guest_client.get(reverse("posts:index"))
         response_2 = response2.content
         self.assertEqual(response_1, response_2)
+        cache.clear()
+        response3 = self.guest_client.get(reverse('posts:index'))
+        response_3 = response3.content
+        self.assertNotEqual(response_2, response_3)
 
     def test_follow_page(self):
         """Авторизованный пользователь может подписываться
@@ -186,11 +194,24 @@ class PostPagesTests(TestCase):
 
     def test_follow_page(self):
         """Проверяем что пост не появился
-        в избранных у обычного пользователя."""
+        в избранных у пользователя подписчика."""
         outsider = User.objects.create(username="NoName")
         self.authorized_client.force_login(outsider)
         response_2 = self.authorized_client.get(reverse("posts:follow_index"))
         self.assertNotIn(self.post, response_2.context["page_obj"])
+
+    def test_follow_correct(self):
+        """тест для проверки вьюх подписки и отписки."""
+        Follow.objects.create(user=self.user, author=self.post.author)
+        response = self.authorized_client.get(
+            reverse('posts:follow_index')
+        )
+        post_text = response.context['page_obj'][0].text
+        self.assertEqual(post_text, 'Тестовый пост')
+        response = self.author.get(
+            reverse('posts:follow_index')
+        )
+        self.assertFalse(response.context['page_obj'])
 
 
 class PaginatorViewsTest(TestCase):

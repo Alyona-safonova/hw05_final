@@ -44,7 +44,7 @@ class PostURLTests(TestCase):
         """Тестируем страницы доступные всем."""
         for address in self.url_names:
             with self.subTest(address):
-                response = self.authorized_client.get(address)
+                response = self.guest_client.get(address)
                 self.assertEqual(response.status_code, 200)
 
     def test_urls_uses_correct_template(self):

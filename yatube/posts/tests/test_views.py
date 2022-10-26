@@ -88,7 +88,7 @@ class PostPagesTests(TestCase):
 
     def test_profile_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
-        response = self.authorized_client.get(
+        response = self.guest_client.get(
             reverse("posts:profile", args=(self.post.author,))
         )
         self.assertIn('author', response.context)
@@ -192,7 +192,7 @@ class PostPagesTests(TestCase):
         response_3 = self.authorized_client.get(reverse("posts:follow_index"))
         self.assertEqual(len(response_3.context["page_obj"]), 0)
 
-    def test_follow_page(self):
+    def test_follow_page_user_follower(self):
         """Проверяем что пост не появился
         в избранных у пользователя подписчика."""
         outsider = User.objects.create(username="NoName")

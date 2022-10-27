@@ -1,8 +1,10 @@
-from django.core.paginator import Paginator
-from posts.forms import PostForm, CommentForm
-from .models import Follow, Post, Group, User, Comment
-from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
+
+from posts.forms import CommentForm, PostForm
+
+from .models import Comment, Follow, Group, Post, User
 
 MAX_POSTS: int = 10
 
@@ -42,7 +44,7 @@ def profile(request, username):
     paginator = Paginator(posts, MAX_POSTS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    following = author.following.filter(user=request.user.id)
+    following = author.following.filter(user=request.user.id).exists()
     context = {
         'author': author,
         'page_obj': page_obj,

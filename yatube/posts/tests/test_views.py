@@ -201,7 +201,6 @@ class PostPagesTests(TestCase):
         self.assertNotIn(self.post, response_2.context["page_obj"])
 
     def test_follow_correct(self):
-        """тест для проверки вьюх подписки и отписки."""
         Follow.objects.create(user=self.user, author=self.post.author)
         response = self.authorized_client.get(
             reverse('posts:follow_index')
@@ -213,6 +212,33 @@ class PostPagesTests(TestCase):
         )
         self.assertFalse(response.context['page_obj'])
 
+    def test_follow(self):
+        """Тестирование подписки."""
+        follow_count = Follow.objects.count()
+        self.author.post(
+            reverse(
+                'posts:profile_follow',
+                kwargs={'username': self.user.username}
+            )
+        )
+        follow = Follow.objects.last()
+        self.assertEqual(Follow.objects.count(), follow_count + 1)
+        self.assertEqual(follow.author, self.user)
+        self.assertEqual(follow.user, self.user1)
+
+    def test_unfollow(self):
+        """Тестирование отписки."""
+        Follow.objects.create(
+            user=self.user1,
+            author=self.user)
+        follow_count = Follow.objects.count()
+        self.author.post(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={'username': self.user.username}
+            )
+        )
+        self.assertEqual(Follow.objects.count(), follow_count - 1)
 
 class PaginatorViewsTest(TestCase):
     @classmethod

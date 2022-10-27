@@ -240,6 +240,7 @@ class PostPagesTests(TestCase):
         )
         self.assertEqual(Follow.objects.count(), follow_count - 1)
 
+
 class PaginatorViewsTest(TestCase):
     @classmethod
     def setUpClass(cls):

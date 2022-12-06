@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'wg!a4gpa)*l(!ru$*6#=buf&%fyx_dwu_@9nfmhvjkg9cw1=hl'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -32,6 +32,10 @@ ALLOWED_HOSTS = [
     'testserver',
 ]
 
+# ALLOWED_HOSTS = [
+#     'www.yatube4alyona.pythonanywhere.com',
+#     'yatube4alyona.pythonanywhere.com',
+# ]
 
 # Application definition
 
@@ -46,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'sorl.thumbnail',
 ]
 
@@ -57,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'yatube.urls'
@@ -149,3 +155,7 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
 }
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

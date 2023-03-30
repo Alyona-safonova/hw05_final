@@ -13,7 +13,14 @@ Cоциальная сеть для публикации личных дневн
 Python 3.7
 Django 2.2.19
 ### Запуск проекта в dev-режиме
-- Установите и активируйте виртуальное окружение
+Создайте виртуальное окружение:
+```bash
+python -m venv venv
+```
+Активируйте его:
+```bash
+source venv/Scripts/activate
+```
 - Установите зависимости из файла requirements.txt
 ```
 pip install -r requirements.txt
